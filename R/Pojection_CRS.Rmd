@@ -19,77 +19,6 @@ knit: (function(input, ...) {
   })
 ---
 
-```{=tex}
-\usepackage{color}
-\color{#B6854D}{\text{}}{-}
-```
-```{=html}
-<style type="text/css">
-body {
-text-align: justify;
-font-style: normal;
-font-family: "Montserrat";
-font-size: 12px
-}
-h1.title {
-  font-size: 40px;
-  color: #1C3BA4;
-}
-h1 {
-  color: #B6854D;
-}
-h2 {
-  color: #172984;
-}
-h3 {
-  color: #172984;
-}
-</style>
-```
-```{=html}
-<style>
-.nav>li>a {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-    color: #1C3BA4
-}
-.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
-    color: #ffffff;
-    background-color: #09C2BC
-}
-</style>
-```
-```{=html}
-<style>
-.tile1-text {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-    color: #0A6A87;
-    list-style: none;
-}
-.top1-tiles a:nth-of-type(1):hover, .top-tiles1 a:nth-of-type(1):focus{
-    color: #ffffff;
-    background: #0A6A87
-}
-</style>
-```
-```{=html}
-<style>
-.tile2-text {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-    color: #0A6CC8;
-    list-style: none;
-}
-.top2-tiles a:nth-of-type(1):hover, .top2-tiles a:nth-of-type(1):focus{
-    color: #ffffff;
-    background: #0A6CC8
-}
-</style>
-```
 ```{=html}
 <style>
 .math {
@@ -120,7 +49,6 @@ require(dplyr)
 require(Hmisc) #%nin%
 require(rgdal)
 require(tibble)
-require(sf)
 require(knitr)
 require(kableExtra)
 require(mapview)
@@ -141,7 +69,7 @@ Las proyecciones geográficas son métodos matemáticos que se utilizan para rep
 
 -   `Acimutales`: Proyectan la Tierra en un plano. Se utilizan para representar áreas polares o cualquier región desde una perspectiva central, como la proyección acimutal equidistante.
 
-## Obetivo
+## Objetivo
 
 1.  Entender que las proyecciones distorsionan alguna propiedad. Es crucial conocer qué tipo de distorsión introduce la proyección que se esta utilizando y cómo afectará la interpretación de los datos.
 
@@ -163,7 +91,11 @@ Los Coordinate Reference Systems (CRS) o Sistemas de Referencia de Coordenadas s
 
 -   **Datum**: Un modelo matemático que define la forma de la Tierra. Existen dos tipos principales de datums:
 
-    -   **Geodésicos**: Definen la forma de la Tierra para representar posiciones globales. Ejemplos incluyen WGS84 (usado por GPS) y NAD83. Verticales: Usados para medir elevaciones respecto a un nivel de referencia, como el nivel del mar. Sistema de Coordenadas: El sistema que especifica las coordenadas que se utilizan (como latitud y longitud en grados, o X e Y en metros).
+    -   **Geodésicos**: Definen la forma de la Tierra para representar posiciones globales. Ejemplos incluyen WGS84 (usado por GPS) y NAD83.
+
+    -   **Verticales**: Usados para medir elevaciones respecto a un nivel de referencia, como el nivel del mar.
+
+    -   **Sistema de Coordenadas**: El sistema que especifica las coordenadas que se utilizan (como latitud y longitud en grados, o X e Y en metros).
 
     -   **Proyección Cartográfica**: Si el CRS es proyectado, incluye una proyección geográfica que transforma las coordenadas desde la superficie curva de la Tierra a un plano bidimensional. Ejemplos incluyen la proyección Mercator, la proyección de Lambert, etc.
 
@@ -248,9 +180,9 @@ shp |>
 
 ## Lambert Azimuthal Equal Area projection
 
-La Proyección Acimutal de Áreas Iguales de Lambert (Lambert Azimuthal Equal Area Projection) se utiliza en situaciones donde es importante mantener la precisión en las áreas relativas de las diferentes partes del mapa; en aplicaciones que requieren comparar áreas entre regiones. 
+La Proyección Acimutal de Áreas Iguales de Lambert (Lambert Azimuthal Equal Area Projection) se utiliza en situaciones donde es importante mantener la precisión en las áreas relativas de las diferentes partes del mapa; en aplicaciones que requieren comparar áreas entre regiones.
 
-- Mapas Polares: Es útil para representar las regiones polares, como el Ártico y la Antártida. 
+-   Mapas Polares: Es útil para representar las regiones polares, como el Ártico y la Antártida.
 
 -   `lat_0=40` y `lon_0=-98` centran la proyección en América del Norte. Puedes ajustar estos valores para centrar la proyección en la región específica de interés.
 
@@ -274,7 +206,7 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-- **Distorsión**: Aunque las áreas se conservan, la forma, la distancia y la dirección pueden estar distorsionadas, especialmente lejos del punto central de la proyección.   
+-   **Distorsión**: Aunque las áreas se conservan, la forma, la distancia y la dirección pueden estar distorsionadas, especialmente lejos del punto central de la proyección.
 
 ## Mollweide projection
 
@@ -304,16 +236,13 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
+-   **Distorsión de Formas y Distancias**: Aunque conserva las áreas, distorsiona las formas, especialmente en los bordes del mapa. Las distancias también son inexactas, y las formas se estiran horizontalmente en los extremos.
 
-- **Distorsión de Formas y Distancias**: Aunque conserva las áreas, distorsiona las formas, especialmente en los bordes del mapa. Las distancias también son inexactas, y las formas se estiran horizontalmente en los extremos. 
+-   **Forma Elíptica**: El mapa resultante tiene una forma elíptica, con el ecuador como la línea más larga y los meridianos convergiendo en los polos, lo que le da su apariencia característica.
 
-- **Forma Elíptica**: El mapa resultante tiene una forma elíptica, con el ecuador como la línea más larga y los meridianos convergiendo en los polos, lo que le da su apariencia característica.
+## Sinusoidal projection
 
-## Sinusoidal projection  
-
-
-La Proyección Sinusoidal (ESRI:54008) es una proyección pseudocilíndrica de áreas equivalentes, conocida por su capacidad para representar correctamente las áreas en un mapa, lo que la hace útil en una variedad de aplicaciones cartográficas, especialmente aquellas que requieren una comparación precisa de superficies. 
-
+La Proyección Sinusoidal (ESRI:54008) es una proyección pseudocilíndrica de áreas equivalentes, conocida por su capacidad para representar correctamente las áreas en un mapa, lo que la hace útil en una variedad de aplicaciones cartográficas, especialmente aquellas que requieren una comparación precisa de superficies.
 
 ```{r}
 crs_esri <- "ESRI:54008"
@@ -333,13 +262,13 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-- **Forma de las Regiones**: Aunque conserva el tamaño de las áreas, distorsiona las formas, especialmente lejos del ecuador. Las regiones cercanas al ecuador están representadas con mayor precisión, mientras que las áreas hacia los polos se distorsionan en la dirección este-oeste.  
+-   **Forma de las Regiones**: Aunque conserva el tamaño de las áreas, distorsiona las formas, especialmente lejos del ecuador. Las regiones cercanas al ecuador están representadas con mayor precisión, mientras que las áreas hacia los polos se distorsionan en la dirección este-oeste.
 
-## Equidistant cylindrical projection  
+## Equidistant cylindrical projection
 
-La Proyección Cilíndrica Equidistante (ESRI:54002) es una proyección cilíndrica simple que mantiene las distancias correctas a lo largo de los meridianos y, en algunos casos, a lo largo de los paralelos. Se caracteriza por su simplicidad y su capacidad para representar distancias de manera lineal, lo que la hace útil en aplicaciones específicas, aunque no conserva la forma ni el área.   
+La Proyección Cilíndrica Equidistante (ESRI:54002) es una proyección cilíndrica simple que mantiene las distancias correctas a lo largo de los meridianos y, en algunos casos, a lo largo de los paralelos. Se caracteriza por su simplicidad y su capacidad para representar distancias de manera lineal, lo que la hace útil en aplicaciones específicas, aunque no conserva la forma ni el área.
 
-- **Mapas de Distancia**: Ideal para mapas que necesitan mostrar distancias desde un punto central a lo largo de diferentes direcciones, como mapas de rutas de transporte o de telecomunicaciones. Su capacidad para mantener distancias precisas a lo largo de los meridianos la hace útil en estos casos.  
+-   **Mapas de Distancia**: Ideal para mapas que necesitan mostrar distancias desde un punto central a lo largo de diferentes direcciones, como mapas de rutas de transporte o de telecomunicaciones. Su capacidad para mantener distancias precisas a lo largo de los meridianos la hace útil en estos casos.
 
 ```{r}
 crs_esri <- "ESRI:54002"
@@ -359,14 +288,13 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-- **Distorsión**: Aunque las distancias a lo largo de los meridianos son precisas, la proyección distorsiona las formas y áreas, especialmente lejos del ecuador. Las áreas cercanas a los polos se estiran significativamente.  
+-   **Distorsión**: Aunque las distancias a lo largo de los meridianos son precisas, la proyección distorsiona las formas y áreas, especialmente lejos del ecuador. Las áreas cercanas a los polos se estiran significativamente.
 
+## Azimuthal Equidistant
 
-## Azimuthal Equidistant   
+La Proyección Acimutal Equidistante, es una proyección cartográfica que representa todas las distancias desde un punto central en el mapa como verdaderas. Esto significa que cualquier línea recta trazada desde el punto central hacia cualquier otro punto del mapa es proporcional a la distancia real en la Tierra.
 
-La Proyección Acimutal Equidistante, es una proyección cartográfica que representa todas las distancias desde un punto central en el mapa como verdaderas. Esto significa que cualquier línea recta trazada desde el punto central hacia cualquier otro punto del mapa es proporcional a la distancia real en la Tierra.   
-
-- Mapas de Comunicación y Cobertura: Un ejemplo típico del uso de la proyección es en los mapas de rutas aéreas desde un aeropuerto central. 
+-   Mapas de Comunicación y Cobertura: Un ejemplo típico del uso de la proyección es en los mapas de rutas aéreas desde un aeropuerto central.
 
 ```{r}
 crs_aeqd <- CRS("+proj=aeqd")
@@ -386,16 +314,15 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-## NAD83: Relatively common projection for North America  
+## NAD83: Relatively common projection for North America
 
-La Proyección NAD83 se refiere al sistema de referencia de coordenadas conocido como North American Datum 1983 (NAD83), que es un sistema geodésico utilizado principalmente en América del Norte. NAD83 es un datum geodésico basado en un elipsoide de referencia para representar la superficie de la Tierra en un sistema de coordenadas cartográficas.   
+La Proyección NAD83 se refiere al sistema de referencia de coordenadas conocido como North American Datum 1983 (NAD83), que es un sistema geodésico utilizado principalmente en América del Norte. NAD83 es un datum geodésico basado en un elipsoide de referencia para representar la superficie de la Tierra en un sistema de coordenadas cartográficas.
 
-- **Datum Geodésico**: `NAD83` es un datum geodésico, lo que significa que proporciona un modelo matemático de la forma de la Tierra (el elipsoide de referencia) y define cómo se posicionan las coordenadas geográficas (`latitud` y `longitud`) en relación con la superficie de la Tierra.   
+-   **Datum Geodésico**: `NAD83` es un datum geodésico, lo que significa que proporciona un modelo matemático de la forma de la Tierra (el elipsoide de referencia) y define cómo se posicionan las coordenadas geográficas (`latitud` y `longitud`) en relación con la superficie de la Tierra.
 
-- **Elipsoide de Referencia**: Utiliza el elipsoide `GRS80` (Geodetic Reference System 1980) como su modelo de referencia, que es un modelo matemático que aproxima la forma de la Tierra.   
+-   **Elipsoide de Referencia**: Utiliza el elipsoide `GRS80` (Geodetic Reference System 1980) como su modelo de referencia, que es un modelo matemático que aproxima la forma de la Tierra.
 
-- **Sistema de Coordenadas**: `NAD83` proporciona un sistema de coordenadas para la región de América del Norte, incluyendo los Estados Unidos, Canadá, y México. Es la base para muchos sistemas de coordenadas locales y regionales en estos países.  
-
+-   **Sistema de Coordenadas**: `NAD83` proporciona un sistema de coordenadas para la región de América del Norte, incluyendo los Estados Unidos, Canadá, y México. Es la base para muchos sistemas de coordenadas locales y regionales en estos países.
 
 ```{r}
 crs_nad83 <- CRS("+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs") 
@@ -415,7 +342,7 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-## Eckert I projection   
+## Eckert I projection
 
 La proyección Eckert I (+proj=eck1) es una proyección pseudocilíndrica que busca equilibrar la distorsión en términos de área y forma. Es una de las proyecciones de la serie Eckert, diseñada para representar áreas grandes con una distorsión mínima en el tamaño de las áreas.
 
@@ -437,9 +364,9 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-## Fahey projection   
+## Fahey projection
 
-La proyección Fahey es una proyección menos común y no tan conocida como otras proyecciones cartográficas estándar. Es una proyección que se utiliza en contextos específicos para representar datos geoespaciales con ciertas características geométricas.  
+La proyección Fahey es una proyección menos común y no tan conocida como otras proyecciones cartográficas estándar. Es una proyección que se utiliza en contextos específicos para representar datos geoespaciales con ciertas características geométricas.
 
 ```{r}
 crs_fahey <- CRS("+proj=fahey")
@@ -459,9 +386,9 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
-## Peirce Q projection   
+## Peirce Q projection
 
-La proyección Peirce Q (+proj=peirce_q) es una proyección pseudocilíndrica que busca ofrecer una representación equilibrada de áreas y distancias, y es una variante de la proyección de Peirce. La opción +lon_0=25 define el meridiano central de la proyección, y +shape=diamond especifica la forma del área de proyección. 
+La proyección Peirce Q (+proj=peirce_q) es una proyección pseudocilíndrica que busca ofrecer una representación equilibrada de áreas y distancias, y es una variante de la proyección de Peirce. La opción +lon_0=25 define el meridiano central de la proyección, y +shape=diamond especifica la forma del área de proyección.
 
 ```{r}
 crs_peirce <- CRS("+proj=peirce_q +lon_0=25 +shape=diamond")
@@ -480,9 +407,10 @@ shp |>
   geom_sf() +
    coord_sf(expand = FALSE)
 ```
-## Quadrilateral Sinusoidal Cylindrical  
 
-La Proyección QSC (Quadrilateral Sinusoidal Cylindrical), una proyección que se utiliza principalmente para representar grandes áreas con una distorsión mínima en las proporciones de área.  El meridiano central en -90 grados de longitud y la latitud de origen en 0 grados (el ecuador) ayudarían a equilibrar la representación de áreas a lo largo del mapa.  
+## Quadrilateral Sinusoidal Cylindrical
+
+La Proyección QSC (Quadrilateral Sinusoidal Cylindrical), una proyección que se utiliza principalmente para representar grandes áreas con una distorsión mínima en las proporciones de área. El meridiano central en -90 grados de longitud y la latitud de origen en 0 grados (el ecuador) ayudarían a equilibrar la representación de áreas a lo largo del mapa.
 
 ```{r}
 crs_qsc <- CRS("+proj=qsc +units=m +ellps=WGS84  +lat_0=0 +lon_0=-90")
@@ -503,11 +431,52 @@ shp |>
   coord_sf(expand = TRUE)
 ```
 
+# World Geodetic System 1984
+
+La proyección `EPSG:4326` es la proyección geográfica estándar `WGS84` (World Geodetic System 1984). Esta es una proyección global que representa la Tierra como una esfera o elipsoide. A partir de esta proyección base, se pueden aplicar varias otras proyecciones, dependiendo del propósito y área geográfica específica que queramos representar. Algunas opciones comunes incluyen:\`
+
+-   Proyección Mercator (`EPSG:3857`): Útil para mapas web globales, aunque distorsiona las áreas en latitudes altas.
+-   Proyecciones cónicas (como Lambert Conformal Conic): Adecuadas para mapear áreas de latitud media.
+-   Proyecciones de área igual (como Albers Equal Area): Ideales para representar áreas grandes manteniendo proporciones correctas.
+-   Proyecciones UTM (Universal Transverse Mercator): Buenas para mapear áreas más pequeñas con alta precisión.
+
+La elección de la proyección dependerá del área geográfica específica que estés mapeando y el propósito del mapa.
+
+```{r}
+crs_wgs84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+
+
+shp <- ne_countries(type = "countries", 
+                   scale = "medium",
+                   returnclass = "sf") |>
+        # transform to desired projection
+        st_transform(crs = crs_wgs84) |>
+          # This is a dummy column used to fill in mean values
+           mutate(mean = rnorm(242, 0.5,0.1))
+
+# Make plot
+shp |>
+  ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+  coord_sf(expand = TRUE)
+```
+
+# Resumen general
+
+Es importante entender cuando utilizar diferentes proyecciones, su función y para qué sirven:
+
+-   **Proyección Mercator:** Es una proyección cilíndrica que preserva los ángulos. Se usa comúnmente para mapas de navegación y mapas web. Sin embargo, distorsiona las áreas, especialmente en latitudes altas.
+-   **Proyección Lambert Conformal Conic:** Es útil para mapear áreas de latitud media. Preserva la forma y minimiza la distorsión de área en las regiones centrales de la proyección.
+-   **Proyección Albers Equal Area:** Es ideal para mapear grandes áreas terrestres, ya que mantiene las proporciones de área correctas. Es comúnmente utilizada para mapas temáticos.
+-   **Proyección UTM (Universal Transverse Mercator):** Se utiliza para mapear áreas más pequeñas con alta precisión. Es útil para trabajos topográficos y cartográficos detallados.
+-   **Proyección Robinson:** Es una proyección de compromiso que intenta equilibrar las distorsiones de área, forma y dirección. Se usa a menudo para mapas mundiales.
+-   **Proyección Winkel Tripel:** Otra proyección de compromiso que minimiza tres tipos de distorsión: área, dirección y distancia. Es utilizada por la National Geographic Society para mapas mundiales.
 
 # Referencias
 
-PROJ (2024) — PROJ 9.4.1 Documentation (1983), <https://proj.org/en/9.4/index.html>
+PROJ contributors. “PROJ Coordinate Transformation Software Library.” Open Source Geospatial Foundation, 2020. <https://proj.org/>
 
+Roger Bivand, Why Have CRS, Projections and Transformations Changed? • Rgdal (2024), <https://rgdal.r-forge.r-project.org/articles/CRS_projections_transformations.html>
 
 ```{r, collapse=FALSE}
 sesion_info <- devtools::session_info()
@@ -520,4 +489,3 @@ kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(att
 ```
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-
