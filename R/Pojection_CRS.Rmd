@@ -1,0 +1,523 @@
+---
+title: "Proyecciones geográficas"
+subtitle: "Ejemplos de cartografías"
+author: "Diana Villasana Ocampo"
+output:
+   html_document:
+      code_folding: hide
+      highlight: tango
+      theme: flatly
+      toc: true
+      toc_depth: 4
+      toc_float:
+        collapsed: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_dir = "../Output"
+    )
+  })
+---
+
+```{=tex}
+\usepackage{color}
+\color{#B6854D}{\text{}}{-}
+```
+```{=html}
+<style type="text/css">
+body {
+text-align: justify;
+font-style: normal;
+font-family: "Montserrat";
+font-size: 12px
+}
+h1.title {
+  font-size: 40px;
+  color: #1C3BA4;
+}
+h1 {
+  color: #B6854D;
+}
+h2 {
+  color: #172984;
+}
+h3 {
+  color: #172984;
+}
+</style>
+```
+```{=html}
+<style>
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #1C3BA4
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li>a:focus {
+    color: #ffffff;
+    background-color: #09C2BC
+}
+</style>
+```
+```{=html}
+<style>
+.tile1-text {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #0A6A87;
+    list-style: none;
+}
+.top1-tiles a:nth-of-type(1):hover, .top-tiles1 a:nth-of-type(1):focus{
+    color: #ffffff;
+    background: #0A6A87
+}
+</style>
+```
+```{=html}
+<style>
+.tile2-text {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #0A6CC8;
+    list-style: none;
+}
+.top2-tiles a:nth-of-type(1):hover, .top2-tiles a:nth-of-type(1):focus{
+    color: #ffffff;
+    background: #0A6CC8
+}
+</style>
+```
+```{=html}
+<style>
+.math {
+  font-size: 15px;
+  color: #B6854D;
+}
+</style>
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = FALSE, collapse = TRUE, 
+                      class.source = "fold-show",
+                      eval = TRUE)
+```
+
+```{r,echo=FALSE, eval=FALSE}
+rm(list = ls())
+```
+
+```{r, echo = FALSE}
+require(showtext)
+# activar showtext
+showtext_auto()
+font_add_google("Montserrat", "montserrat")
+```
+
+```{r, echo = FALSE}
+require(dplyr)
+require(Hmisc) #%nin%
+require(rgdal)
+require(tibble)
+require(sf)
+require(knitr)
+require(kableExtra)
+require(mapview)
+require(grDevices)
+require(pals)
+library(sf)
+library(rnaturalearth)
+require(ggplot2)
+```
+
+Las proyecciones geográficas son métodos matemáticos que se utilizan para representar la superficie tridimensional de la Tierra (una esfera o elipsoide) en un mapa bidimensional. Dado que es imposible aplanar una esfera sin distorsionar alguna propiedad, todas las proyecciones geográficas introducen algún tipo de distorsión en áreas, formas, distancias o ángulos.
+
+# Tipos de Proyecciones Geográficas
+
+-   `Cilíndricas`: Proyectan la superficie de la Tierra en un cilindro que luego se desenrolla. La proyección de Mercator es la más conocida y conserva los ángulos (conformidad) pero distorsiona las áreas, especialmente cerca de los polos.
+
+-   `Cónicas`: Proyectan la superficie en un cono que toca la Tierra en uno o dos puntos. Son útiles para mapear regiones de latitudes medias, como las proyecciones de Albers y Lambert, que conservan áreas o distancias respectivamente.
+
+-   `Acimutales`: Proyectan la Tierra en un plano. Se utilizan para representar áreas polares o cualquier región desde una perspectiva central, como la proyección acimutal equidistante.
+
+## Obetivo
+
+1.  Entender que las proyecciones distorsionan alguna propiedad. Es crucial conocer qué tipo de distorsión introduce la proyección que se esta utilizando y cómo afectará la interpretación de los datos.
+
+2.  **Proyección Específica vs. Proyección Global**: Algunas proyecciones son más adecuadas para mapas de áreas pequeñas (locales) mientras que otras se usan para representar el mundo entero. Conocer la escala del mapa ayudará a elegir la proyección correcta.
+
+3.  **Parámetros de Proyección**: Algunas proyecciones requieren parámetros adicionales como el meridiano central o paralelos estándar. Entender cómo ajustar estos parámetros es esencial para una representación precisa.
+
+4.  Las **proyecciones** son mapeados puramente cartográficos de la esfera sobre el plano.
+
+5.  Las **conversiones** son operaciones de coordenadas que no modifican el sistema de referencia.
+
+6.  Las operaciones que cambian el sistema de referencia se denominan **transformaciones**.
+
+## Coordinate Reference Systems (CRS)
+
+Los Coordinate Reference Systems (CRS) o Sistemas de Referencia de Coordenadas son marcos matemáticos que definen cómo se representan las ubicaciones geográficas en un espacio bidimensional (mapa) o tridimensional (globo terráqueo). Un CRS proporciona un conjunto de reglas para convertir entre coordenadas geográficas (latitud, longitud, y, altura) y coordenadas en un mapa o un sistema de proyección específico.
+
+### Componentes
+
+-   **Datum**: Un modelo matemático que define la forma de la Tierra. Existen dos tipos principales de datums:
+
+    -   **Geodésicos**: Definen la forma de la Tierra para representar posiciones globales. Ejemplos incluyen WGS84 (usado por GPS) y NAD83. Verticales: Usados para medir elevaciones respecto a un nivel de referencia, como el nivel del mar. Sistema de Coordenadas: El sistema que especifica las coordenadas que se utilizan (como latitud y longitud en grados, o X e Y en metros).
+
+    -   **Proyección Cartográfica**: Si el CRS es proyectado, incluye una proyección geográfica que transforma las coordenadas desde la superficie curva de la Tierra a un plano bidimensional. Ejemplos incluyen la proyección Mercator, la proyección de Lambert, etc.
+
+-   **Unidad de Medida**: La unidad en la que se expresan las coordenadas, como metros, pies, o grados. Muchas veces es importante obtener representaciones precisas de ubicaciones geográficas, entre ellos es esencial para superponer datos con precisión y garantizar precisión en trabajos de georreferenciación, análisis espacial y cartografía.
+
+### Tipos de CRS
+
+-   **Geográficos**: Basados en un datum y expresados en coordenadas angulares (latitud y longitud). Ejemplo: `WGS84 (EPSG:4326)`.
+
+-   **Proyectados**: Basados en una proyección geográfica que convierte coordenadas angulares en coordenadas planas. Ejemplo: `UTM(Universal Transverse Mercator)`, donde cada zona tiene su propio CRS.
+
+-   **Verticales**: Usados para medir elevación o profundidad respecto a un datum vertical.
+
+## Proyecciones
+
+Las proyecciones geográficas más comunes se utilizan ampliamente en cartografía debido a su utilidad en representar diferentes aspectos de la superficie terrestre. A continuación, se presentan algunas de las proyecciones incluido en el paquete [`PROJ`](https://github.com/OSGeo/PROJ/tree/maste):
+
+::: {style="height:350px;overflow:auto;"}
+```{r, echo = FALSE}
+require(gt)
+require(openxlsx)
+tabla <- read.xlsx(paste0(here::here(), "/Data/Projections.xlsx"))
+
+tabla %>% 
+ gt() %>%
+  tab_header(title = "Projections",
+             subtitle = "Coordinate Reference System (CRS)") %>%
+   tab_footnote(footnote = c("Source: https://proj.org/en/9.4/")) %>%
+    tab_options(heading.title.font.size = 15, 
+                heading.subtitle.font.size = 12,
+                table.align = "center",
+                column_labels.font.weight = "bold",
+                table.font.names = 'Century Gothic',
+                table.font.size = 10,
+                data_row.padding = px(1)) %>%
+     tab_style(style = list(cell_text(align = "left",
+                            weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+     cols_width("Projections" ~ px(250), 
+                "proj-string" ~ px(250),
+                "Classification" ~ px(150),
+                "Available.forms" ~ px(250),
+                "Defined.area" ~ px(120),
+                everything() ~ px(60)) %>% 
+      as_raw_html() 
+```
+:::
+
+# CRS, projections and transformations
+
+A continuación se presentan algunas projecciones y transformaciones y cambios en la representación de los sistemas de referencia de coordenadas (`CRS`).
+
+## Robinson projection
+
+La Proyección de Robinson se usa principalmente para crear mapas mundiales y otros mapas de gran escala que buscan un equilibrio visual entre la distorsión de área, forma, distancia y dirección. Su diseño se enfoca en minimizar la distorsión general, ofreciendo una representación visualmente atractiva y fácil de interpretar del mundo.
+
+-   Mapa de atlas educativos
+-   Mapas Políticos Mundiales
+-   Presentaciones Visuales
+-   Mapas de Referencia General
+
+```{r}
+#crs_robinson <-  CRS("+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+crs_robinson <- "ESRI:54030"
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_robinson) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+## Lambert Azimuthal Equal Area projection
+
+La Proyección Acimutal de Áreas Iguales de Lambert (Lambert Azimuthal Equal Area Projection) se utiliza en situaciones donde es importante mantener la precisión en las áreas relativas de las diferentes partes del mapa; en aplicaciones que requieren comparar áreas entre regiones. 
+
+- Mapas Polares: Es útil para representar las regiones polares, como el Ártico y la Antártida. 
+
+-   `lat_0=40` y `lon_0=-98` centran la proyección en América del Norte. Puedes ajustar estos valores para centrar la proyección en la región específica de interés.
+
+-   `x_0=0` y `y_0=0` definen los valores de origen de coordenadas en metros.
+
+```{r}
+crs_laea <- CRS("+proj=laea +lat_0=40 +lon_0=-98 +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs")
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_laea) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+- **Distorsión**: Aunque las áreas se conservan, la forma, la distancia y la dirección pueden estar distorsionadas, especialmente lejos del punto central de la proyección.   
+
+## Mollweide projection
+
+La Proyección de Mollweide es una proyección pseudocilíndrica de áreas equivalentes que se utiliza principalmente para representar el mundo entero o grandes áreas de la Tierra donde la preservación del área es crucial.
+
+-   Mapas Temáticos Globales: población: la densidad forestal, la cobertura del suelo, la biodiversidad, o los patrones climáticos.
+-   Mapas de Distribución: extensión de desiertos, selvas, zonas de conflicto, o la difusión de especies animales o vegetales.
+-   Mapas de Densidad: densidad de población o la densidad de eventos geográficos (como terremotos o tormentas).
+-   Mapas Educativos y Científicos: representación justa del tamaño relativo de los continentes y océanos.
+
+```{r}
+crs_mollweide <- CRS("+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+crs_mollweide <- "ESRI:54009"
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_mollweide) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+
+- **Distorsión de Formas y Distancias**: Aunque conserva las áreas, distorsiona las formas, especialmente en los bordes del mapa. Las distancias también son inexactas, y las formas se estiran horizontalmente en los extremos. 
+
+- **Forma Elíptica**: El mapa resultante tiene una forma elíptica, con el ecuador como la línea más larga y los meridianos convergiendo en los polos, lo que le da su apariencia característica.
+
+## Sinusoidal projection  
+
+
+La Proyección Sinusoidal (ESRI:54008) es una proyección pseudocilíndrica de áreas equivalentes, conocida por su capacidad para representar correctamente las áreas en un mapa, lo que la hace útil en una variedad de aplicaciones cartográficas, especialmente aquellas que requieren una comparación precisa de superficies. 
+
+
+```{r}
+crs_esri <- "ESRI:54008"
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_esri) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+- **Forma de las Regiones**: Aunque conserva el tamaño de las áreas, distorsiona las formas, especialmente lejos del ecuador. Las regiones cercanas al ecuador están representadas con mayor precisión, mientras que las áreas hacia los polos se distorsionan en la dirección este-oeste.  
+
+## Equidistant cylindrical projection  
+
+La Proyección Cilíndrica Equidistante (ESRI:54002) es una proyección cilíndrica simple que mantiene las distancias correctas a lo largo de los meridianos y, en algunos casos, a lo largo de los paralelos. Se caracteriza por su simplicidad y su capacidad para representar distancias de manera lineal, lo que la hace útil en aplicaciones específicas, aunque no conserva la forma ni el área.   
+
+- **Mapas de Distancia**: Ideal para mapas que necesitan mostrar distancias desde un punto central a lo largo de diferentes direcciones, como mapas de rutas de transporte o de telecomunicaciones. Su capacidad para mantener distancias precisas a lo largo de los meridianos la hace útil en estos casos.  
+
+```{r}
+crs_esri <- "ESRI:54002"
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_esri) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+- **Distorsión**: Aunque las distancias a lo largo de los meridianos son precisas, la proyección distorsiona las formas y áreas, especialmente lejos del ecuador. Las áreas cercanas a los polos se estiran significativamente.  
+
+
+## Azimuthal Equidistant   
+
+La Proyección Acimutal Equidistante, es una proyección cartográfica que representa todas las distancias desde un punto central en el mapa como verdaderas. Esto significa que cualquier línea recta trazada desde el punto central hacia cualquier otro punto del mapa es proporcional a la distancia real en la Tierra.   
+
+- Mapas de Comunicación y Cobertura: Un ejemplo típico del uso de la proyección es en los mapas de rutas aéreas desde un aeropuerto central. 
+
+```{r}
+crs_aeqd <- CRS("+proj=aeqd")
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_aeqd) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+## NAD83: Relatively common projection for North America  
+
+La Proyección NAD83 se refiere al sistema de referencia de coordenadas conocido como North American Datum 1983 (NAD83), que es un sistema geodésico utilizado principalmente en América del Norte. NAD83 es un datum geodésico basado en un elipsoide de referencia para representar la superficie de la Tierra en un sistema de coordenadas cartográficas.   
+
+- **Datum Geodésico**: `NAD83` es un datum geodésico, lo que significa que proporciona un modelo matemático de la forma de la Tierra (el elipsoide de referencia) y define cómo se posicionan las coordenadas geográficas (`latitud` y `longitud`) en relación con la superficie de la Tierra.   
+
+- **Elipsoide de Referencia**: Utiliza el elipsoide `GRS80` (Geodetic Reference System 1980) como su modelo de referencia, que es un modelo matemático que aproxima la forma de la Tierra.   
+
+- **Sistema de Coordenadas**: `NAD83` proporciona un sistema de coordenadas para la región de América del Norte, incluyendo los Estados Unidos, Canadá, y México. Es la base para muchos sistemas de coordenadas locales y regionales en estos países.  
+
+
+```{r}
+crs_nad83 <- CRS("+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs") 
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_aeqd) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+## Eckert I projection   
+
+La proyección Eckert I (+proj=eck1) es una proyección pseudocilíndrica que busca equilibrar la distorsión en términos de área y forma. Es una de las proyecciones de la serie Eckert, diseñada para representar áreas grandes con una distorsión mínima en el tamaño de las áreas.
+
+```{r}
+crs_eckert <- CRS("+proj=eck1")  
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_eckert) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+## Fahey projection   
+
+La proyección Fahey es una proyección menos común y no tan conocida como otras proyecciones cartográficas estándar. Es una proyección que se utiliza en contextos específicos para representar datos geoespaciales con ciertas características geométricas.  
+
+```{r}
+crs_fahey <- CRS("+proj=fahey")
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_fahey) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+
+## Peirce Q projection   
+
+La proyección Peirce Q (+proj=peirce_q) es una proyección pseudocilíndrica que busca ofrecer una representación equilibrada de áreas y distancias, y es una variante de la proyección de Peirce. La opción +lon_0=25 define el meridiano central de la proyección, y +shape=diamond especifica la forma del área de proyección. 
+
+```{r}
+crs_peirce <- CRS("+proj=peirce_q +lon_0=25 +shape=diamond")
+
+#countries polygons
+shp <- rnaturalearth::ne_countries(type = "countries", 
+                                   scale = "medium",
+                                   returnclass = "sf") |>  
+                                   # transform to desired projection
+                                   st_transform(crs_peirce) |>
+                                   # This is a dummy column used to fill in mean values
+                                    mutate(mean = rnorm(242, 0.5,0.1))
+
+shp |>
+ ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+   coord_sf(expand = FALSE)
+```
+## Quadrilateral Sinusoidal Cylindrical  
+
+La Proyección QSC (Quadrilateral Sinusoidal Cylindrical), una proyección que se utiliza principalmente para representar grandes áreas con una distorsión mínima en las proporciones de área.  El meridiano central en -90 grados de longitud y la latitud de origen en 0 grados (el ecuador) ayudarían a equilibrar la representación de áreas a lo largo del mapa.  
+
+```{r}
+crs_qsc <- CRS("+proj=qsc +units=m +ellps=WGS84  +lat_0=0 +lon_0=-90")
+
+
+shp <- ne_countries(type = "countries", 
+                   scale = "medium",
+                   returnclass = "sf") |>
+        # transform to desired projection
+        st_transform(crs = crs_qsc) |>
+          # This is a dummy column used to fill in mean values
+           mutate(mean = rnorm(242, 0.5,0.1))
+
+# Make plot
+shp |>
+  ggplot(aes(fill = mean, color = mean)) +
+  geom_sf() +
+  coord_sf(expand = TRUE)
+```
+
+
+# Referencias
+
+PROJ (2024) — PROJ 9.4.1 Documentation (1983), <https://proj.org/en/9.4/index.html>
+
+
+```{r, collapse=FALSE}
+sesion_info <- devtools::session_info()
+```
+
+```{r, echo = FALSE}
+kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+   kable_classic(full_width = TRUE, html_font = "montserrat", font_size = 10) 
+```
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
