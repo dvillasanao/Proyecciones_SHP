@@ -69,7 +69,7 @@ ggplot() +
 - Siempre considerar las distorsiones que cada proyección puede introducir en tu mapa.   
 
 
-## Proyecciones   
+## Proyecciones 🌍  
 
 En el siguiente script se muestra de manera general la estructura del uso de los diferentes tipos de proyecciones geográficas.     
 
