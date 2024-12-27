@@ -62,3 +62,11 @@ ggplot() +
   que se este mapeando y el propósito de tu mapa.
 - Siempre considerar las distorsiones que cada proyección puede
   introducir en tu mapa.
+
+## Proyecciones
+
+En el siguiente script se muestra de manera general la estructura del
+uso de los diferentes tipos de proyecciones geográficas.
+
+**Enlace:**
+<https://dvillasanao.github.io/Proyecciones_SHP/Output/Pojection_CRS.html>
