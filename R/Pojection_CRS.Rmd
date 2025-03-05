@@ -408,6 +408,12 @@ shp |>
    coord_sf(expand = FALSE)
 ```
 
+```{r, echo = FALSE, eval = FALSE}
+require(ggpubr)
+path = paste0(here::here(), "/Output/Peirce Q projection.pdf")
+ggexport(shp, filename = path ,width = 10, height = 10, device = "cairo")
+```
+
 ## Quadrilateral Sinusoidal Cylindrical
 
 La Proyección QSC (Quadrilateral Sinusoidal Cylindrical), una proyección que se utiliza principalmente para representar grandes áreas con una distorsión mínima en las proporciones de área. El meridiano central en -90 grados de longitud y la latitud de origen en 0 grados (el ecuador) ayudarían a equilibrar la representación de áreas a lo largo del mapa.
@@ -460,6 +466,13 @@ shp |>
   geom_sf() +
   coord_sf(expand = TRUE)
 ```
+
+```{r, echo = FALSE, eval = FALSE}
+require(ggpubr)
+path = paste0(here::here(), "/Output/World Geodetic System 1984.pdf")
+ggexport(shp, filename = path ,width = 10, height = 10, device = "cairo")
+```
+
 
 # Resumen general
 
