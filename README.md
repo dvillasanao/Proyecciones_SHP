@@ -13,8 +13,8 @@ paquetes especializados como `sf`, `ggplot2` y `rnaturalearth`.
 
 <div style="display: flex; justify-content: center;">
 
-<img src="Output/World Geodetic System 1984.png" width="55%" style="margin: 1px;">
-<img src="Output/Peirce Q projection.png" width="45%" style="margin: 1px;">
+<img src="Output/World Geodetic System 1984.png" width="45%" style="margin: 1px;">
+<img src="Output/Peirce Q projection.png" width="35%" style="margin: 1px;">
 
 </div>
 
